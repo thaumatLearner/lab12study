@@ -3,8 +3,42 @@ import _ from 'lodash';
 import ngRoute from 'angular-route';
 
 angular.module('fswd.todo', ['ngRoute'])
+  .run(function($rootScope) {
+    $rootScope.$on('$routeChangeError', function() {
+      alert('Route change error!');
+    });
+  })
+  .config(function($routeProvider) {
+    $routeProvider.when('/tasks', {
+      controller: 'TodoListController',
+      controllerAs: 'vm',
+      templateUrl: '/partials/taskList'
+    });
+    $routeProvider.when('/tasks/:task_id', {
+      controller: 'TodoController',
+      controllerAs: 'vm',
+      template: '<h1>MY TASK IS {{ vm.task.name | uppercase }}</h1>',
+      resolve: {
+        task: function(TodoListService, $route) {
+          return TodoListService.retrieveTodo($route.current.params.task_id);
+        }
+      }
+    });
+    $routeProvider.otherwise('/tasks');
+  })
+  .controller('TodoController', function(task) {
+    var vm = this;
+    vm.task = task;
+  })
   .service('TodoListService', function($http) {
     var todoList = ['Groceries', 'Dinner', 'Breakfast'];
+
+    this.retrieveTodo = function(taskId) {
+      return $http.get('/tasks/' + taskId)
+        .then(function(response) {
+          return response.data;
+        })
+    };
 
     this.retrieveTodoList = function() {
       return $http.get('/tasks')
@@ -58,7 +92,7 @@ angular.module('fswd.todo', ['ngRoute'])
       scope: {
         todo: '=task'
       },
-      template: "{{ todo.name }} ({{ todo.createdAt | date:'shortDate'}})"
+      template: "<a href='#/tasks/{{ todo.id }}'>{{ todo.name }}</a> ({{ todo.createdAt | date:'shortDate'}})"
     }
   })
   .directive('fswdTaskList', function() {
