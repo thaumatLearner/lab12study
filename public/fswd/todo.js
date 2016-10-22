@@ -26,19 +26,6 @@ angular.module('fswd.todo', ['ngRoute'])
         });
         $routeProvider.otherwise('/tasks');
     })
-    .controller('TodoController', function(task) {
-        var vm = this;
-        console.log(task);
-        vm.task = task;
-
-        vm.task.check = function() {
-            TodoListService.check();
-        };
-
-        vm.submitUpdate = function(toUpdate) {
-            TodoListService.submitUpdate(toUpdate);
-        };
-    })
     .service('TodoListService', function($http) {
         var todoList = ['Groceries', 'Dinner', 'Breakfast'];
 
@@ -70,20 +57,6 @@ angular.module('fswd.todo', ['ngRoute'])
                     todoList = response.data;
                 });
         };
-
-        this.check = function() {
-            console.log('serviceCheck');
-        };
-
-        this.submitUpdate = function(toUpdate) {
-            console.log('toUpdate');
-            console.log(toUpdate);
-            $http.post('/tasks', { todo: toUpdate })
-                .then(function(response) {
-                    task.name = response.data;
-                })
-        };
-
     })
     .controller('TodoListController', function(TodoListService, $scope) {
         var vm = this;
@@ -107,6 +80,17 @@ angular.module('fswd.todo', ['ngRoute'])
             vm.todoList = newVal;
         });
 
+    })
+    .controller('TodoController', function(task, $http) {
+        var vm = this;
+        vm.task = task;
+
+        vm.submitUpdate = function(toUpdate) {
+            return $http.post('/tasks/' + 7, { todo: toUpdate })
+                .then(function(response) {
+                    task.name = response.data.name;
+                })
+        };
     })
     .directive('fswdTask', function() {
         return {
