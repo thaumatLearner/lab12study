@@ -1,0 +1,13 @@
+/// this could, and probably should (for consistency), be redone using controllers?
+div
+  h1 MY TASK IS {{ vm.task.name | uppercase }}:
+  p
+    code {{ vm.task.name }}
+    |  - created on
+    code {{ vm.task.createdAt | date:'shortDate' }}
+    code {{ vm.task.check }}
+  div
+    form.form-inline
+      div.form-group(ng-submit="vm.task.check()")
+        input(ng-model="text" type="text")
+        button(type="submit") Update Task
