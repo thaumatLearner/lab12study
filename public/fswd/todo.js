@@ -86,7 +86,7 @@ angular.module('fswd.todo', ['ngRoute'])
         vm.task = task;
 
         vm.submitUpdate = function(toUpdate) {
-            return $http.post('/tasks/' + 7, { todo: toUpdate })
+            return $http.post('/tasks/' + task.id, { todo: toUpdate })
                 .then(function(response) {
                     task.name = response.data.name;
                 })
